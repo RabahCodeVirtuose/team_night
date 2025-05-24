@@ -1,0 +1,365 @@
+
+# 📘 **Spécifications fonctionnelles & techniques — TeamNight**
+
+## 🧭 Objectif du projet
+
+Créer un **portail événementiel en ligne** destiné aux habitants de la Grande Kabylie, pour **organiser facilement des événements (mariages, fêtes)** en regroupant tous les services nécessaires : DJ, salle, gâteau, voiture, caméraman, mobilier, traiteur, etc.
+Les utilisateurs pourront :
+
+* Consulter des services par catégorie
+* Choisir un **pack clé-en-main** ou **composer un événement personnalisé**
+* Gérer un panier et obtenir un **devis automatique**
+* Réserver, payer en ligne ou en point relais
+* Gagner des points de fidélité
+* Interagir via publications, commentaires, messages
+
+---
+
+## 🧱 Structure des entités
+
+---
+
+### 1. **User**
+
+Représente les utilisateurs inscrits (clients, admins, collaborateurs si besoin).
+
+| Champ      | Type      | Description                           |
+| ---------- | --------- | ------------------------------------- |
+| id         | int       | Clé primaire                          |
+| email      | string    | Email unique                          |
+| password   | string    | Mot de passe hashé                    |
+| roles      | string\[] | Rôles (ROLE\_USER, ROLE\_ADMIN, etc.) |
+| nom        | string    | Nom                                   |
+| prenom     | string    | Prénom                                |
+| telephone  | string    | Numéro de téléphone                   |
+| isVerified | bool      | Compte vérifié ?                      |
+| type       | string    | Type d’utilisateur (client/admin/…)   |
+
+🧩 Relations :
+
+* 1\:N → Adresse
+* 1\:N → ContactMessage
+* 1\:N → Conversation (client/admin)
+* 1\:N → Message
+* 1\:N → Reservation
+* 1\:N → Publication
+* 1\:N → Commentaire
+* 1\:N → Panier
+* 1:1 → Fidelite
+
+---
+
+### 2. **Adresse**
+
+Adresse postale de l’utilisateur.
+
+| Champ        | Type   |
+| ------------ | ------ |
+| id           | int    |
+| rue          | string |
+| ville        | string |
+| codePostal   | string |
+| pays         | string |
+| fk\_user\_id | int    |
+
+---
+
+### 3. **Fidelite**
+
+Système de fidélité par points.
+
+| Champ        | Type   |
+| ------------ | ------ |
+| id           | int    |
+| points       | int    |
+| niveau       | string |
+| fk\_user\_id | int    |
+
+---
+
+### 4. **Collaborateur**
+
+Partenaire externe (loueur de voiture, salle, pâtissier, etc.).
+
+| Champ        | Type   |
+| ------------ | ------ |
+| id           | int    |
+| nom          | string |
+| email        | string |
+| telephone    | string |
+| description  | text   |
+| adresse      | string |
+| isDisponible | bool   |
+| noteGlobale  | float  |
+
+🧩 Relation :
+
+* 1\:N → Service
+
+---
+
+### 5. **Service**
+
+Un service proposé par un collaborateur (ex : DJ, salle, voiture...).
+
+| Champ                 | Type   |
+| --------------------- | ------ |
+| id                    | int    |
+| nom                   | string |
+| description           | text   |
+| categorie             | string |
+| prixBase              | float  |
+| isActif               | bool   |
+| slug                  | string |
+| fk\_collaborateur\_id | int    |
+
+🧩 Relation :
+
+* 1\:N → Media
+
+---
+
+### 6. **Pack**
+
+Offre groupée de services prédéfinis (bronze, gold…).
+
+| Champ        | Type   |
+| ------------ | ------ |
+| id           | int    |
+| nom          | string |
+| description  | text   |
+| prix         | float  |
+| isDisponible | bool   |
+| slug         | string |
+
+🧩 Relation :
+
+* N\:M → Service via `Pack_Service`
+
+---
+
+### 7. **Pack\_Service**
+
+Table pivot entre Pack et Service.
+
+| Champ           | Type |
+| --------------- | ---- |
+| id              | int  |
+| fk\_pack\_id    | int  |
+| fk\_service\_id | int  |
+
+---
+
+### 8. **Panier**
+
+Événement personnalisé en cours de création par l’utilisateur.
+
+| Champ        | Type     |
+| ------------ | -------- |
+| id           | int      |
+| dateCreation | datetime |
+| statut       | string   |
+| totalEstime  | float    |
+| fk\_user\_id | int      |
+
+🧩 Relation :
+
+* 1\:N → Panier\_Service
+* 1:1 → Devis
+
+---
+
+### 9. **Panier\_Service**
+
+Service ajouté dans le panier.
+
+| Champ           | Type  |
+| --------------- | ----- |
+| id              | int   |
+| quantite        | int   |
+| prixEstime      | float |
+| fk\_panier\_id  | int   |
+| fk\_service\_id | int   |
+
+---
+
+### 10. **Devis**
+
+PDF généré depuis le panier.
+
+| Champ          | Type     |
+| -------------- | -------- |
+| id             | int      |
+| dateCreation   | datetime |
+| montantTotal   | float    |
+| fichierPdf     | string   |
+| statut         | string   |
+| fk\_panier\_id | int      |
+
+---
+
+### 11. **CodePromo**
+
+Réduction via code promo.
+
+| Champ                | Type     |
+| -------------------- | -------- |
+| id                   | int      |
+| code                 | string   |
+| reductionPourcentage | float    |
+| dateExpiration       | datetime |
+| utilisationMax       | int      |
+
+---
+
+### 12. **PaiementOption**
+
+Méthodes de paiement (Edahabia, point relais, carte…).
+
+| Champ        | Type   |
+| ------------ | ------ |
+| id           | int    |
+| nom          | string |
+| description  | text   |
+| isDisponible | bool   |
+
+---
+
+### 13. **Reservation**
+
+Événement validé/réservé.
+
+| Champ           | Type     |
+| --------------- | -------- |
+| id              | int      |
+| dateReservation | datetime |
+| commentaire     | text     |
+| status          | string   |
+| fk\_user\_id    | int      |
+| fk\_event\_id   | int      |
+
+---
+
+### 14. **Reservation\_Prestation**
+
+Table de lien entre réservation et services associés.
+
+| Champ               | Type |
+| ------------------- | ---- |
+| id                  | int  |
+| fk\_reservation\_id | int  |
+| fk\_prestation\_id  | int  |
+
+---
+
+### 15. **Paiement**
+
+Détail du paiement.
+
+| Champ               | Type     |
+| ------------------- | -------- |
+| id                  | int      |
+| montant             | float    |
+| methode             | string   |
+| status              | string   |
+| datePaiement        | datetime |
+| fk\_reservation\_id | int      |
+
+---
+
+### 16. **Facture**
+
+Facture PDF émise à partir d’une réservation.
+
+| Champ               | Type     |
+| ------------------- | -------- |
+| id                  | int      |
+| numero              | string   |
+| dateEmission        | datetime |
+| montantTotal        | float    |
+| fichierPdf          | string   |
+| fk\_reservation\_id | int      |
+
+---
+
+### 17. **Event**
+
+Événement concret (soirée DJ, mariage...).
+
+| Champ        | Type     |
+| ------------ | -------- |
+| id           | int      |
+| titre        | string   |
+| description  | text     |
+| categorie    | string   |
+| date         | datetime |
+| lieu         | string   |
+| nbInvites    | int      |
+| prixBase     | float    |
+| isDisponible | bool     |
+| slug         | string   |
+
+---
+
+### 18. **Publication**
+
+Contenu (blog, actualité...).
+
+| Champ         | Type     |
+| ------------- | -------- |
+| id            | int      |
+| titre         | string   |
+| contenu       | text     |
+| categorie     | string   |
+| slug          | string   |
+| createdAt     | datetime |
+| updatedAt     | datetime |
+| isPublished   | bool     |
+| fk\_user\_id  | int      |
+| fk\_event\_id | int      |
+
+---
+
+### 19. **Commentaire**
+
+Réaction d’un utilisateur à une publication.
+
+| Champ               | Type     |
+| ------------------- | -------- |
+| id                  | int      |
+| contenu             | text     |
+| createdAt           | datetime |
+| isVisible           | bool     |
+| fk\_user\_id        | int      |
+| fk\_publication\_id | int      |
+
+---
+
+### 20. **Media**
+
+Photo ou vidéo.
+
+| Champ               | Type   |
+| ------------------- | ------ |
+| id                  | int    |
+| nom                 | string |
+| fichier             | string |
+| type                | string |
+| ordre               | int    |
+| fk\_event\_id       | int    |
+| fk\_prestation\_id  | int    |
+| fk\_publication\_id | int    |
+| fk\_service\_id     | int    |
+
+---
+
+## ✅ Prochaine étape
+
+Tu peux commencer par créer :
+
+1. `User`
+2. `Service`
+3. `Collaborateur`
+4. `Panier`
+
+…et générer les entités, relations et migrations petit à petit. Si tu veux, je te donne un **plan de création progressive** dans l’ordre optimal pour Symfony + Doctrine. Dis-moi 👇
