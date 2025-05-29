@@ -1,5 +1,22 @@
 
 ## Commandes utilisées
+supprimer la base de données php bin/console doctrine:schema:drop --force --full-database
+C:\Users\HP\AppData\Roaming\DBeaverData\workspace6\General\Scripts
+# Résumé rapide 
+rm -rf migrations/*
+php bin/console doctrine:schema:drop --force --full-database
+php bin/console make:migration
+php bin/console doctrine:migrations:migrate
+php bin/console doctrine:fixtures:load
+
+public function up(Schema $schema): void
+{
+$this->addSql("CREATE TYPE reaction_type AS ENUM ('like', 'love', 'haha', 'wow', 'grrr');");
+$this->addSql("CREATE TYPE notification_type AS ENUM ('reaction', 'comment', 'validation', 'alert', 'info');");
+}
+
+il faut remplacer ça CREATE TABLE reaction (id SERIAL NOT NULL, utilisateur_id INT DEFAULT NULL, publication_id INT DEFAULT NULL, type 'like','love','haha','wow','grrr' NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, PRIMARY KEY(id))
+ en ça  CREATE TABLE reaction (id SERIAL NOT NULL, utilisateur_id INT DEFAULT NULL, publication_id INT DEFAULT NULL, type reaction_type NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, PRIMARY KEY(id))
 
 ### Symfony
 ### question 2
@@ -16,7 +33,7 @@ L’API permet d’accéder aux ressources suivantes :
 
 ### Animal
 
-- `GET /api/animals` : liste de tous les animaux
+- `GET /api/animals` : liste de tous les animaux    
 - `POST /api/animals` : ajouter un nouvel animal
 - `GET /api/animals/{id}` : afficher un animal spécifique
 - `DELETE /api/animals/{id}` : supprimer un animal
@@ -108,3 +125,41 @@ L'utilisateur peut rechercher des observations en combinant plusieurs critères 
 Cela permet de mieux affiner la recherche en fonction de plusieurs paramètres.
 
 
+
+
+🔧 Table reaction :
+Champ	Type	Description
+id	int	Clé primaire
+user_id	FK → User	Qui a réagi
+publication_id	FK → Publication	Sur quoi
+type	string	Type de réaction : 'like', 'haha', 'grrr'...
+created_at	datetime	Date de réaction
+
+
+| Champ        | Type                | Description                                         |
+| ------------ | ------------------- | --------------------------------------------------- |
+| `id`         | `int`               | Clé primaire auto-incrémentée                       |
+| `user_id`    | `FK` → User         | Le **destinataire** de la notif                     |
+| `type`       | `enum` ou `string`  | Le type : `reaction`, `comment`, `validation`, etc. |
+| `message`    | `string`            | Le message affiché                                  |
+| `is_read`    | `bool`              | True/false si elle a été lue                        |
+| `created_at` | `datetime`          | Date de création                                    |
+| `target_url` | `string (nullable)` | Lien vers l’élément concerné                        |
+
+
+
+Je développe actuellement une plateforme web moderne en Symfony (backend) avec API Platform, Angular (frontend), 
+et PostgreSQL pour la base de données. Ce projet s'appelle TeamNight, une agence événementielle en Algérie qui vise
+à devenir un véritable portail de réservation et de gestion d'événements (mariages, soirées, anniversaires, etc.) 
+avec un système de packs, de services personnalisés, et un panier de réservation. Côté front-end, je réfléchis à 
+une interface fluide et intuitive, inspirée de Facebook : après connexion, l'utilisateur atterrit sur un journal 
+où il voit les publications, avec un menu pour accéder aux packs, au simulateur de réservation, aux souvenirs 
+(événements marquants), etc. J’ai conçu une entité Publication enrichie avec un champ isApproved (publication validée par admin)
+et souvenir (pour classer une publication dans la page souvenir). J’ajoute aussi une entité Reaction (type : like, haha, grrr...)
+liée à un utilisateur et une publication, et je gère ça proprement avec un enum PHP + type Doctrine personnalisé 
+(ReactionTypeType). Même chose pour l’entité Notification, qui notifie un utilisateur lorsqu’un autre réagit à sa 
+publication, avec champ is_read, message, target_url et enum NotificationType. Je suis en train de créer et 
+enregistrer ces enums proprement dans Symfony avec les fichiers nécessaires (src/Enum, src/DBAL/Types, config 
+dans doctrine.yaml). Mon objectif est de garder une architecture propre, scalable, et orientée utilisateurs, 
+tout en préparant potentiellement une future migration vers application mobile. J’ai besoin d’un accompagnement 
+structuré, technique et moderne pour finaliser tous ces composants (front + back + base) proprement.

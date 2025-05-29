@@ -32,7 +32,9 @@ when@test:
         dbal:
             # "TEST_TOKEN" is typically set by ParaTest
             dbname_suffix: '_test%env(default::TEST_TOKEN)%'
-
+            types:
+                NotificationType: App\DBAL\Types\NotificationTypeType
+                reaction_type: App\DBAL\Types\ReactionTypeType
 when@prod:
     doctrine:
         orm:

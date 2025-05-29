@@ -240,15 +240,15 @@ Méthodes de paiement (Edahabia, point relais, carte…).
 
 ---
 
-### 14. **Reservation\_Prestation**
+14. Reservation_Service
+Lien entre une réservation confirmée et les services réservés.
 
-Table de lien entre réservation et services associés.
-
+Champ	Type
 | Champ               | Type |
 | ------------------- | ---- |
 | id                  | int  |
 | fk\_reservation\_id | int  |
-| fk\_prestation\_id  | int  |
+| fk\_service\_id     | int  |
 
 ---
 
@@ -347,7 +347,6 @@ Photo ou vidéo.
 | type                | string |
 | ordre               | int    |
 | fk\_event\_id       | int    |
-| fk\_prestation\_id  | int    |
 | fk\_publication\_id | int    |
 | fk\_service\_id     | int    |
 
