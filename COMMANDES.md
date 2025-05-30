@@ -49,7 +49,7 @@ L’API permet d’accéder aux ressources suivantes :
 - `PATCH /api/observations/{id}` : modifier une observation
 
 
-
+composer require symfony/form 
 ### question 3
 - symfony composer require orm-fixtures --dev
 - symfony composer require fakerphp/faker
