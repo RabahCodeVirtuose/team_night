@@ -7,11 +7,13 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'users')]
 #[ApiResource]
-class Users implements \Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface
+class Users implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -128,12 +130,15 @@ class Users implements \Symfony\Component\Security\Core\User\PasswordAuthenticat
 
     public function getRoles(): array
     {
-        return $this->roles;
+        $roles = $this->roles;
+        $roles[] = 'ROLE_USER';
+        return array_unique($roles);
+
     }
 
     public function setRoles(array $roles): static
     {
-        $this->roles = $roles;
+        $this->roles= $roles;
 
         return $this;
     }
@@ -409,4 +414,12 @@ class Users implements \Symfony\Component\Security\Core\User\PasswordAuthenticat
     }
 
 
+    public function eraseCredentials(): void{
+        // elle est juste vide
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this -> email;
+    }
 }
