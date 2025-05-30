@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250529201923 extends AbstractMigration
+final class Version20250530103245 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -81,7 +81,7 @@ final class Version20250529201923 extends AbstractMigration
             CREATE INDEX IDX_6A2CA10CED5CA9E6 ON media (service_id)
         SQL);
         $this->addSql(<<<'SQL'
-            CREATE TABLE notification (id SERIAL NOT NULL, utilisateur_id INT DEFAULT NULL, type notification_type NOT NULL, message VARCHAR(255) NOT NULL, is_read BOOLEAN NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, target_url VARCHAR(255) DEFAULT NULL, PRIMARY KEY(id))
+            CREATE TABLE notification (id SERIAL NOT NULL, utilisateur_id INT DEFAULT NULL, type public."notification_type" NOT NULL, message VARCHAR(255) NOT NULL, is_read BOOLEAN NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, target_url VARCHAR(255) DEFAULT NULL, PRIMARY KEY(id))
         SQL);
         $this->addSql(<<<'SQL'
             CREATE INDEX IDX_BF5476CAFB88E14F ON notification (utilisateur_id)
@@ -135,7 +135,7 @@ final class Version20250529201923 extends AbstractMigration
             CREATE INDEX IDX_DE704C2B71F7E88B ON publication_event (event_id)
         SQL);
         $this->addSql(<<<'SQL'
-            CREATE TABLE reaction (id SERIAL NOT NULL, utilisateur_id INT DEFAULT NULL, publication_id INT DEFAULT NULL, type reaction_type NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, PRIMARY KEY(id))
+            CREATE TABLE reaction (id SERIAL NOT NULL, utilisateur_id INT DEFAULT NULL, publication_id INT DEFAULT NULL, type public."reaction_type" NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, PRIMARY KEY(id))
         SQL);
         $this->addSql(<<<'SQL'
             CREATE INDEX IDX_A4D707F7FB88E14F ON reaction (utilisateur_id)

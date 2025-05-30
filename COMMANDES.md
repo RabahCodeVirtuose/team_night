@@ -8,6 +8,7 @@ php bin/console doctrine:schema:drop --force --full-database
 php bin/console make:migration
 php bin/console doctrine:migrations:migrate
 php bin/console doctrine:fixtures:load
+symfony console doctrine:database:create
 
 public function up(Schema $schema): void
 {

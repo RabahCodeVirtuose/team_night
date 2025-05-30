@@ -18,7 +18,7 @@ class Notification
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(type: NotificationTypeType::NAME,enumType: NotificationType::class)]
+    #[ORM\Column(type: 'notification_type')]
     private ?NotificationType $type = null;
 
     #[ORM\ManyToOne(inversedBy: 'notifications')]

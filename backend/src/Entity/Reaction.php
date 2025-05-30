@@ -18,7 +18,7 @@ class Reaction
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(type: ReactionTypeType::NAME, enumType: ReactionType::class)]
+    #[ORM\Column(type: 'reaction_type')]
     private ?ReactionType $type = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
@@ -83,3 +83,4 @@ class Reaction
         return $this;
     }
 }
+

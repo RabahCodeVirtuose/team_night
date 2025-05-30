@@ -10,6 +10,8 @@ use App\DBAL\Types\NotificationTypeType;
 use App\DBAL\Types\ReactionTypeType;
 class Kernel extends BaseKernel
 {
+    use MicroKernelTrait;
+
     /**
      * @throws Exception
      */
@@ -17,13 +19,12 @@ class Kernel extends BaseKernel
     {
         parent::boot();
 
-        if (!Type::hasType(NotificationTypeType::NAME)) {
-            Type::addType(NotificationTypeType::NAME, NotificationTypeType::class);
+        if (!Type::hasType('notification_type')) {
+            Type::addType('notification_type', NotificationTypeType::class);
         }
 
-        if (!Type::hasType(ReactionTypeType::NAME)) {
-            Type::addType(ReactionTypeType::NAME, ReactionTypeType::class);
+        if (!Type::hasType('reaction_type')) {
+            Type::addType('reaction_type', ReactionTypeType::class);
         }
     }
-    use MicroKernelTrait;
 }

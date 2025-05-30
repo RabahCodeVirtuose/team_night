@@ -1,186 +1,171 @@
-ajouter enumeration
-
-
----
-
-##  Implémentation d’énumérations (ENUM) PostgreSQL avec Symfony, Doctrine et PHP 8.1+
-
-Ce projet utilise des `enum` PHP modernes (`ReactionType`, `NotificationType`) stockés comme **types ENUM natifs PostgreSQL**, avec une conversion automatique assurée par **Doctrine**. Voici les étapes suivies pour garantir une intégration propre et scalable :
+ **guide complet en Markdown** pour documenter proprement l’approche basée sur l’article d’Ángel Cardiel (avec `AbstractEnumType`) que tu peux coller directement dans ton `README.md` :
 
 ---
 
-### 1. Déclaration de l’`enum` PHP
+````md
+## 🧩 Intégration des types ENUM PostgreSQL avec Symfony + Doctrine (méthode `AbstractEnumType`)
+
+Ce projet utilise une approche compatible avec PostgreSQL et Doctrine pour intégrer des types ENUM (par exemple : `reaction_type`, `notification_type`) en s'inspirant de la méthode `AbstractEnumType` décrite par Ángel Cardiel.
+
+Cette solution permet :
+
+- De stocker les valeurs ENUM comme vrais types PostgreSQL (`CREATE TYPE ... AS ENUM`)
+- De faire le mapping proprement dans Doctrine
+- D’éviter les erreurs `Unknown database type ...`
+- De rester compatible avec Symfony, même sans utiliser les `enum` PHP 8.1+
+
+---
+
+### 🧱 1. Création d’une classe `AbstractEnumType`
 
 ```php
-// src/Enum/ReactionType.php
-namespace App\Enum;
+// src/DBAL/Types/AbstractEnumType.php
 
-enum ReactionType: string
-{
-    case LIKE = 'like';
-    case LOVE = 'love';
-    case HAHA = 'haha';
-    case WOW  = 'wow';
-    case GRRR = 'grrr';
-}
-```
-
----
-
-### 2. Création d’un type Doctrine personnalisé
-
-```php
-// src/DBAL/Types/ReactionTypeType.php
 namespace App\DBAL\Types;
 
-use App\Enum\ReactionType;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type;
 
-class ReactionTypeType extends Type
+abstract class AbstractEnumType extends Type
 {
-    public const NAME = 'reaction_type';
+    protected string $schema = 'public';
+    protected string $name;
+    protected array $values = [];
 
-    public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform): string
+    public function getSQLDeclaration(array $column, AbstractPlatform $platform): string
     {
-        return self::NAME;
+        return $this->schema . '."' . $this->getName() . '"';
     }
 
     public function convertToPHPValue($value, AbstractPlatform $platform): mixed
     {
-        return ReactionType::from($value);
+        return $value;
     }
 
-    public function convertToDatabaseValue($value, AbstractPlatform $platform): string
+    public function convertToDatabaseValue($value, AbstractPlatform $platform): mixed
     {
-        return $value instanceof ReactionType ? $value->value : throw new \InvalidArgumentException();
+        if (!in_array($value, $this->getValidValues(), true)) {
+            throw new \InvalidArgumentException("Invalid '{$this->name}' value.");
+        }
+
+        return $value;
     }
 
     public function getName(): string
     {
-        return self::NAME;
+        return $this->name;
     }
 
     public function requiresSQLCommentHint(AbstractPlatform $platform): bool
     {
         return true;
     }
+
+    public function getValidValues(): array
+    {
+        return $this->values;
+    }
 }
-```
+````
 
 ---
 
-### 3. Enregistrement dans `doctrine.yaml`
+### 🧩 2. Définition d’un type ENUM concret
+
+```php
+// src/DBAL/Types/NotificationTypeType.php
+
+namespace App\DBAL\Types;
+
+class NotificationTypeType extends AbstractEnumType
+{
+    protected string $name = 'notification_type';
+    protected array $values = [
+        'reaction',
+        'comment',
+        'validation',
+        'alert',
+        'info',
+    ];
+}
+```
+
+Même chose pour `ReactionTypeType`.
+
+---
+
+### ⚙️ 3. Configuration dans `doctrine.yaml`
 
 ```yaml
-# config/packages/doctrine.yaml
 doctrine:
   dbal:
     types:
-      reaction_type: App\DBAL\Types\ReactionTypeType
       notification_type: App\DBAL\Types\NotificationTypeType
+      reaction_type: App\DBAL\Types\ReactionTypeType
+    mapping_types:
+      notification_type: string
+      reaction_type: string
 ```
 
 ---
 
-### 4. Enregistrement global (nécessaire pour les migrations)
-
-Dans `src/Kernel.php` :
+### 🧬 4. Enregistrement dans le `Kernel`
 
 ```php
+// src/Kernel.php
+
+use App\DBAL\Types\NotificationTypeType;
+use App\DBAL\Types\ReactionTypeType;
 use Doctrine\DBAL\Types\Type;
 
-protected function boot(): void
+public function boot(): void
 {
     parent::boot();
 
-    if (!Type::hasType('reaction_type')) {
-        Type::addType('reaction_type', \App\DBAL\Types\ReactionTypeType::class);
+    if (!Type::hasType('notification_type')) {
+        Type::addType('notification_type', NotificationTypeType::class);
     }
 
-    if (!Type::hasType('notification_type')) {
-        Type::addType('notification_type', \App\DBAL\Types\NotificationTypeType::class);
+    if (!Type::hasType('reaction_type')) {
+        Type::addType('reaction_type', ReactionTypeType::class);
     }
 }
 ```
 
 ---
 
-### 5. Utilisation dans les entités
+### 🧾 5. Utilisation dans une entité
 
 ```php
-#[ORM\Column(type: ReactionTypeType::NAME, enumType: ReactionType::class)]
-private ReactionType $type;
+#[ORM\Column(type: 'notification_type')]
+private string $type;
 ```
 
 ---
 
-### 6. Création manuelle des types ENUM dans PostgreSQL
+### 🗃️ 6. Création des types ENUM dans la base PostgreSQL
 
-Ajout dans une migration Doctrine :
+Ajoute manuellement dans ta migration Doctrine :
 
 ```php
-$this->addSql("CREATE TYPE reaction_type AS ENUM ('like', 'love', 'haha', 'wow', 'grrr');");
 $this->addSql("CREATE TYPE notification_type AS ENUM ('reaction', 'comment', 'validation', 'alert', 'info');");
+$this->addSql("CREATE TYPE reaction_type AS ENUM ('like', 'love', 'haha', 'wow', 'grrr');");
 ```
 
----
-
-### 7. Correction manuelle des types dans les colonnes
-
-Remplacer ce que Doctrine génère parfois à tort :
+Et dans la création de table :
 
 ```sql
-type 'like','love','haha' ...
-```
-
-par :
-
-```sql
-type reaction_type NOT NULL
-```
-
----
-
-### 8. Migration
-
-```bash
-php bin/console doctrine:migrations:migrate
-```
-
----
-
-### 9. Vérification dans PostgreSQL
-
-```sql
-\d+ reaction;
-\d+ notification;
-```
-
-Les colonnes `type` doivent être de type `reaction_type` et `notification_type`.
-
----
-
-### 10. Fonctionnement automatique
-
-Doctrine convertit automatiquement vers/depuis l’`enum` PHP :
-
-```php
-$reaction = new Reaction();
-$reaction->setType(ReactionType::LIKE);
-
-$repo->find(1)->getType()->value; // "like"
+type notification_type NOT NULL
 ```
 
 ---
 
 ### ✅ Résultat
 
-* ✅ Enums PHP modernes
-* ✅ Types ENUM PostgreSQL natifs
-* ✅ Conversion automatique Doctrine
-* ✅ Architecture propre et stricte
-* ✅ Prêt pour API Platform, formulaires, validation, etc.
+* Migration possible avec `make:migration` sans erreur
+* Conversion automatique Doctrine ↔ PostgreSQL
+* Données sécurisées via ENUM natif PostgreSQL
+* Code maintenable et évolutif
 
 ---
 
