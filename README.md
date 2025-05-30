@@ -1,22 +1,24 @@
- **guide complet en Markdown** pour documenter proprement l’approche basée sur l’article d’Ángel Cardiel (avec `AbstractEnumType`) que tu peux coller directement dans ton `README.md` :
+## Guide basé sur **la méthode inspirée de l'article d'Ángel Cardiel**, avec la classe `AbstractEnumType` et PostgreSQL.
 
 ---
 
-````md
-## 🧩 Intégration des types ENUM PostgreSQL avec Symfony + Doctrine (méthode `AbstractEnumType`)
+## 🎯 Utilisation des types ENUM PostgreSQL personnalisés avec Symfony + Doctrine
 
-Ce projet utilise une approche compatible avec PostgreSQL et Doctrine pour intégrer des types ENUM (par exemple : `reaction_type`, `notification_type`) en s'inspirant de la méthode `AbstractEnumType` décrite par Ángel Cardiel.
-
-Cette solution permet :
-
-- De stocker les valeurs ENUM comme vrais types PostgreSQL (`CREATE TYPE ... AS ENUM`)
-- De faire le mapping proprement dans Doctrine
-- D’éviter les erreurs `Unknown database type ...`
-- De rester compatible avec Symfony, même sans utiliser les `enum` PHP 8.1+
+Ce projet utilise une méthode propre et compatible PostgreSQL pour gérer des types ENUM, sans s'appuyer sur les `enum PHP 8.1+`.
+On suit ici la méthode inspirée de l’article d’Ángel Cardiel, avec une classe abstraite `AbstractEnumType`.
 
 ---
 
-### 🧱 1. Création d’une classe `AbstractEnumType`
+### ✅ Objectifs
+
+* Utiliser de vrais types `ENUM` PostgreSQL (`reaction_type`, `notification_type`)
+* Les mapper proprement dans Doctrine
+* Éviter les erreurs `Unknown database type` lors des migrations
+* Conserver un code compatible avec Symfony, Doctrine et PostgreSQL
+
+---
+
+### 🧱 1. Créer la classe `AbstractEnumType`
 
 ```php
 // src/DBAL/Types/AbstractEnumType.php
@@ -66,11 +68,13 @@ abstract class AbstractEnumType extends Type
         return $this->values;
     }
 }
-````
+```
 
 ---
 
-### 🧩 2. Définition d’un type ENUM concret
+### 🔧 2. Créer les types concrets
+
+#### `NotificationTypeType`
 
 ```php
 // src/DBAL/Types/NotificationTypeType.php
@@ -90,11 +94,29 @@ class NotificationTypeType extends AbstractEnumType
 }
 ```
 
-Même chose pour `ReactionTypeType`.
+#### `ReactionTypeType`
+
+```php
+// src/DBAL/Types/ReactionTypeType.php
+
+namespace App\DBAL\Types;
+
+class ReactionTypeType extends AbstractEnumType
+{
+    protected string $name = 'reaction_type';
+    protected array $values = [
+        'like',
+        'love',
+        'haha',
+        'wow',
+        'grrr',
+    ];
+}
+```
 
 ---
 
-### ⚙️ 3. Configuration dans `doctrine.yaml`
+### ⚙️ 3. Enregistrer les types dans `doctrine.yaml`
 
 ```yaml
 doctrine:
@@ -109,11 +131,9 @@ doctrine:
 
 ---
 
-### 🧬 4. Enregistrement dans le `Kernel`
+### 🧠 4. Enregistrement au boot dans `Kernel.php`
 
 ```php
-// src/Kernel.php
-
 use App\DBAL\Types\NotificationTypeType;
 use App\DBAL\Types\ReactionTypeType;
 use Doctrine\DBAL\Types\Type;
@@ -134,38 +154,40 @@ public function boot(): void
 
 ---
 
-### 🧾 5. Utilisation dans une entité
+### 🧬 5. Utilisation dans les entités
 
 ```php
 #[ORM\Column(type: 'notification_type')]
 private string $type;
 ```
 
+> ✅ Pas besoin d’utiliser une `enum PHP`, car les valeurs sont validées via `AbstractEnumType`.
+
 ---
 
-### 🗃️ 6. Création des types ENUM dans la base PostgreSQL
+### 🛠️ 6. Créer manuellement les types ENUM dans PostgreSQL
 
-Ajoute manuellement dans ta migration Doctrine :
+Dans ta migration :
 
 ```php
-$this->addSql("CREATE TYPE notification_type AS ENUM ('reaction', 'comment', 'validation', 'alert', 'info');");
 $this->addSql("CREATE TYPE reaction_type AS ENUM ('like', 'love', 'haha', 'wow', 'grrr');");
+$this->addSql("CREATE TYPE notification_type AS ENUM ('reaction', 'comment', 'validation', 'alert', 'info');");
 ```
 
-Et dans la création de table :
+Et dans les colonnes :
 
 ```sql
-type notification_type NOT NULL
+type reaction_type NOT NULL
 ```
 
 ---
 
 ### ✅ Résultat
 
-* Migration possible avec `make:migration` sans erreur
-* Conversion automatique Doctrine ↔ PostgreSQL
-* Données sécurisées via ENUM natif PostgreSQL
-* Code maintenable et évolutif
+* 🎯 Types ENUM PostgreSQL natifs
+* ⚙️ Doctrine comprend parfaitement les colonnes
+* ✅ Pas de bug `Unknown database type`
+* 🧼 Code clair, sans `enum PHP`, mais 100% strict et validé
 
 ---
 
