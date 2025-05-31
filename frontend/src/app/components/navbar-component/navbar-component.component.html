@@ -1,0 +1,35 @@
+<mat-toolbar>
+
+  <span class="logo-container">
+    <img src="/tamawragh.png" alt="logo" id="logo-img">
+  </span>
+  <!-- Champ de recherche -->
+
+  <mat-form-field id="search-field">
+      <input  matInput #filter placeholder="DJ, salle..." />
+  </mat-form-field>
+
+  <button mat-icon-button (click)="filterResults(filter.value)">
+    <mat-icon>search</mat-icon>
+  </button>
+
+  <span class="spacer"></span>
+  <button routerLink="/" mat-icon-button aria-label="Accueil">
+    <mat-icon>home</mat-icon>
+  </button>
+  <button routerLink="/packs" mat-icon-button aria-label="Packs">
+    <mat-icon>card_giftcard</mat-icon>
+  </button>
+  <button routerLink="/simulator" mat-icon-button aria-label="Réserver">
+    <mat-icon>event</mat-icon>
+  </button>
+  <button routerLink="/notifications" mat-icon-button aria-label="Notifications">
+    <mat-icon>notifications</mat-icon>
+  </button>
+  <button routerLink="/profile" mat-icon-button aria-label="Profil">
+    <mat-icon>account_circle</mat-icon>
+  </button>
+  <button mat-icon-button aria-label="Menu">
+    <mat-icon>menu</mat-icon>
+  </button>
+</mat-toolbar>
