@@ -1,35 +1,59 @@
 <mat-toolbar>
 
   <span class="logo-container">
-    <img src="/tamawragh.png" alt="logo" id="logo-img">
+    <img src="/orangina.png" alt="logo" id="logo-img">
   </span>
   <!-- Champ de recherche -->
 
-  <mat-form-field id="search-field">
-      <input  matInput #filter placeholder="DJ, salle..." />
-  </mat-form-field>
+      <input id="search-field" type="text" placeholder="DJ, salle..." #filter >
 
   <button mat-icon-button (click)="filterResults(filter.value)">
-    <mat-icon>search</mat-icon>
+    <mat-icon style="color:#D6955B">search</mat-icon>
   </button>
 
   <span class="spacer"></span>
-  <button routerLink="/" mat-icon-button aria-label="Accueil">
-    <mat-icon>home</mat-icon>
+  <button routerLink="/" mat-icon-button aria-label="Accueil" class="nav-button">
+    <div class="icon-label">
+      <mat-icon>home</mat-icon>
+      <span>Accueil</span>
+    </div>
   </button>
-  <button routerLink="/packs" mat-icon-button aria-label="Packs">
-    <mat-icon>card_giftcard</mat-icon>
+
+  <button routerLink="/packs" mat-icon-button aria-label="Packs" class="nav-button">
+    <div class="icon-label">
+      <mat-icon>card_giftcard</mat-icon>
+      <span>Packs</span>
+    </div>
   </button>
-  <button routerLink="/simulator" mat-icon-button aria-label="Réserver">
-    <mat-icon>event</mat-icon>
+
+  <button routerLink="/simulator" mat-icon-button aria-label="Réserver" class="nav-button">
+    <div class="icon-label">
+      <mat-icon>event</mat-icon>
+      <span>Réserver</span>
+    </div>
   </button>
-  <button routerLink="/notifications" mat-icon-button aria-label="Notifications">
-    <mat-icon>notifications</mat-icon>
+
+  <button routerLink="/notifications" mat-icon-button aria-label="Notifications" class="nav-button">
+    <div class="icon-label">
+      <mat-icon>notifications</mat-icon>
+      <span>Alertes</span>
+    </div>
   </button>
-  <button routerLink="/profile" mat-icon-button aria-label="Profil">
-    <mat-icon>account_circle</mat-icon>
+
+  <button routerLink="/login" mat-icon-button aria-label="Profil" class="nav-button">
+    <div class="icon-label">
+      <mat-icon>account_circle</mat-icon>
+      <span>Profil</span>
+    </div>
   </button>
-  <button mat-icon-button aria-label="Menu">
-    <mat-icon>menu</mat-icon>
+  <!-- Authentification avec @if -->
+  @if (!auth.isAuthentified) {
+    <button mat-raised-button color="accent" routerLink="/login">Login</button>
+  } @else {
+    <span style="margin-right: 1rem;">Hello {{ auth.getNom() }}</span>
+    <button mat-raised-button color="warn" (click)="logout()">Logout</button>
+  }
+  <button mat-icon-button aria-label="Menu" >
+    <mat-icon style="color:#D6955B">menu</mat-icon>
   </button>
 </mat-toolbar>

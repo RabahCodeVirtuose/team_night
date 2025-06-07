@@ -12,7 +12,6 @@ class JWTCreatedListener
         $user = $event->getUser();
 
         if (!$user instanceof Users) {
-            // LOG pour vérifier si le user est mal typé
             error_log('JWTCreatedListener: user is not an instance of User');
             return;
         }
@@ -24,8 +23,8 @@ class JWTCreatedListener
 
         $payload['id'] = $user->getId();
         $payload['email'] = $user->getEmail();
+        $payload['nom'] = $user->getPrenom();
         $payload['roles'] = $user->getRoles();
-
         $event->setData($payload);
     }
 }

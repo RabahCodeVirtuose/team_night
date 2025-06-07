@@ -2,40 +2,58 @@
   max-width: 900px;
   margin: 0 auto;
   padding: 40px 20px;
-  font-family: 'Arial', sans-serif;
+  font-family: 'Poppins', sans-serif;
+  text-align: justify;
 
-  h1 {
-    font-size: 32px;
-    margin-bottom: 20px;
+  p {
+    margin-bottom: 16px;
+    line-height: 1.7;
   }
 
   .features-list {
+    margin-top: 20px;
     list-style: none;
     padding: 0;
-    margin-top: 20px;
 
     li {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 12px;
       margin-bottom: 14px;
 
       mat-icon {
         font-size: 24px;
+        margin-top: 3px;
       }
 
       span {
         font-size: 16px;
+        text-align: justify;
       }
     }
   }
 
   .credit {
-    margin-top: 30px;
     font-style: italic;
     color: #666;
+    text-align: center;
+    margin-top: 30px;
   }
-  .titrageamazigh{
-    font-size:34px;
+
+  .titrageamazigh {
+    font-size: 2.2rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
   }
+}
+
+mat-icon{
+  color:#D6955B;
+}
+strong{
+  color : #D6955B;
+}
+#bingo{
+  color:#18534F;
 }

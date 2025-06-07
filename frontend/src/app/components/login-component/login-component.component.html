@@ -1,1 +1,53 @@
-<p>login-component works!</p>
+
+<div id="encadrement">
+  @if (!auth.isAuthentified) {
+    <form class="login-form" (submit)="login()">
+      <mat-form-field appearance="outline">
+        <mat-label>Email</mat-label>
+        <input
+          matInput
+          [formControl]="email"
+          name="email"
+          type="text"
+          required
+          (input)="auth.reset_error()"
+        />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Mot de passe</mat-label>
+        <input
+          matInput
+          [formControl]="password"
+          [type]="hidePassword ? 'password' : 'text'"
+          name="password"
+          required
+          (input)="auth.reset_error()"
+        />
+        <button
+          mat-icon-button
+          matSuffix
+          type="button"
+          (click)="togglePasswordVisibility()"
+          [attr.aria-label]="'Toggle mot de passe'"
+        >
+          <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <div class="login-actions">
+        <button [disabled]="!isValid" mat-raised-button color="primary" type="submit" id="boutonConecter">Se connecter</button>
+      </div>
+
+      @if (auth.error) {
+        <div class="error-msg">
+          <button mat-flat-button color="warn" disabled>Authentification échouée</button>
+        </div>
+      }
+    </form>
+  } @else {
+    <h1 class="welcome">Bienvenue {{ auth.nom }} !</h1>
+  }
+
+</div>
+

@@ -17,17 +17,49 @@ mat-toolbar{
 mat-icon{
   color: #FEEAA1;
 }
+
+
+
 #search-field {
+  width: 30%;
+  height: 50%;
+  border-radius: 23px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  border: none;
+}
+
+
+mat-form-field {
+  width: 100%;
+  height: 100%;
+  padding: 50px;
+  margin: 0;
+}
+
+.label {
+  margin-top: 2px;
+  font-size: 11px;
+  color: #555;
+}
+.nav-button {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  width: 30%;
-  height: 100%;
-  margin-top: 18px;
-  margin-bottom: 0 !important;
+  padding: 0 4px;
+  margin: 5px;
 }
 
-mat-form-field {
-  font-size: 14px;
+.icon-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 11px;
+  color: #FEEAA1;
+  text-align: center;
+}
+
+.icon-label mat-icon {
+  font-size: 24px;
 }
